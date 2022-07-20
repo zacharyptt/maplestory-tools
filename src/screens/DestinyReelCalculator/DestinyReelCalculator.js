@@ -85,7 +85,7 @@ export default function Calculator() {
                     計算使用恢復卡衝命運卷成本
                 </Typography>
                 <Box sx={{display: 'flex'}}>
-                    <Box sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column', flex: 1}}>
+                    <Box sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column', flex: 1, mr: 3}}>
                         <FormControl>
                             <RadioGroup
                                 value={nowDataKey}
