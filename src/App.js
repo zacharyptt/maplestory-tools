@@ -1,20 +1,24 @@
 import {Brightness4Outlined, Brightness5Outlined} from '@mui/icons-material';
-import {Container, IconButton, Link} from '@mui/material';
+import {Box, Container, IconButton, Link} from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {useMemo} from 'react';
 import {Link as RouterLink, Route, Routes} from 'react-router-dom';
-import DestinyReelCalculator from './screens/DestinyReelCalculator/DestinyReelCalculator';
+import DestinyScrollCalculatorScreen from './screens/DestinyScrollCalculator/DestinyScrollCalculatorScreen';
+import VirtualDrawScreen from './screens/VirtualDraw/VirtualDrawScreen';
 import useStore from './zustand/useStore';
 function Home() {
     return (
         <Container sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', p: 7}}>
             楓之谷小工具
-            <nav>
-                <Link component={RouterLink} to="/calculator">
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Link component={RouterLink} to="/destiny-scroll-calculator">
                     計算武器使用恢復卡衝命運卷成本
                 </Link>
-            </nav>
+                <Link component={RouterLink} to="/virtual-draw">
+                    模擬抽獎
+                </Link>
+            </Box>
         </Container>
     );
 }
@@ -38,15 +42,11 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <div>
-                <IconButton onClick={toggleTheme} size="large">
-                    {mode === 'dark' ? <Brightness4Outlined /> : <Brightness5Outlined />}
-                </IconButton>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="calculator" element={<DestinyReelCalculator />} />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/destiny-scroll-calculator" element={<DestinyScrollCalculatorScreen />} />
+                <Route path="/virtual-draw" element={<VirtualDrawScreen />} />
+            </Routes>
         </ThemeProvider>
     );
 }
