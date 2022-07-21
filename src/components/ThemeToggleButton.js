@@ -1,6 +1,6 @@
 import {Brightness4Outlined, Brightness5Outlined} from '@mui/icons-material';
 import {IconButton} from '@mui/material';
-import useStore from '../zustand/useStore';
+import useStore from 'myZustand/useAPPStore';
 
 const ThemeToggleButton = () => {
     const mode = useStore((state) => state.mode);
@@ -10,7 +10,7 @@ const ThemeToggleButton = () => {
         });
     };
     return (
-        <IconButton onClick={toggleTheme} size="large">
+        <IconButton color="inherit" onClick={toggleTheme} size="large">
             {mode === 'dark' ? <Brightness4Outlined /> : <Brightness5Outlined />}
         </IconButton>
     );

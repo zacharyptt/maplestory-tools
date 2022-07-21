@@ -20,11 +20,11 @@ import {
     Typography,
 } from '@mui/material';
 import {useEffect, useMemo, useRef} from 'react';
-import Header from '../../components/Header';
-import data8369 from '../../drawData/data8369';
-import data8614 from '../../drawData/data8614';
-import dataDestinyPet from '../../drawData/dataDestinyPet';
-import dataDestinyWeapon from '../../drawData/dataDestinyWeapon';
+import Header from 'components/Header';
+import data8369 from 'drawData/data8369';
+import data8614 from 'drawData/data8614';
+import dataDestinyPet from 'drawData/dataDestinyPet';
+import dataDestinyWeapon from 'drawData/dataDestinyWeapon';
 import GrabArea from './GrabArea';
 import useStore from './useStore';
 const data = {
