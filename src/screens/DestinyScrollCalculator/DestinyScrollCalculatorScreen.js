@@ -1,24 +1,11 @@
 import {Box, Button, Container, Divider, TextField, Typography} from '@mui/material';
-import {useEffect, useMemo, useRef, useState} from 'react';
 import Header from 'components/Header';
+import produce from 'immer';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import SetDataKeyAndShowChance from './SetDataKeyAndShowChance';
 import useDrawData from './useDrawData';
 import useZState from './useZState';
-import {
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    ScatterChart,
-    Scatter,
-    AreaChart,
-    Area,
-} from 'recharts';
-import produce from 'immer';
 const draw = (drawData) => {
     const random = Math.random();
     let count = 0;
