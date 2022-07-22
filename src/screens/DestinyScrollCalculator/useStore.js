@@ -5,7 +5,7 @@ const useStore = create(
         (set) => ({
             nowDataKey: 'weaponData',
             targetNums: 13,
-            minAtt: 15,
+            minAttack: 15,
             scrollPrice: 35,
             restoreCardPrice: 75,
             expectTotal: 30,

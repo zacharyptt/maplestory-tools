@@ -52,6 +52,8 @@ export default function DestinyScrollCalculatorScreen() {
     const [resultList, setResultList] = useState([]);
     const [resultList2, setResultList2] = useState([]);
     const [total, setTotal] = useState(0); //總共衝了幾次
+    const [numsData, setNumsData] = useState({}); //衝完卷軸所需次數資料
+    const [averageAttackData, setAverageAttackData] = useState({}); //卷軸平均攻擊
     const drawData = useDrawData();
     const _first = useRef(true);
 
@@ -65,8 +67,7 @@ export default function DestinyScrollCalculatorScreen() {
         }
         _first.current = false;
     }, [drawData, setExpectTotal, setMinAttack]);
-    const [repeatList, setRepeatList] = useState([]);
-    const [testData, setTestData] = useState({});
+
     const getGreaterThanMinAttackOnce = (index) => {
         if (drawData[drawData.length - 1].add < minAttack) {
             alert('最小攻擊超出範圍');
@@ -95,34 +96,71 @@ export default function DestinyScrollCalculatorScreen() {
                         (array.length + parseInt(existScroll))) *
                         100
                 ) / 100;
-            setRepeatList((state) => [
-                ...state,
-                {
-                    id: index,
-                    total: count,
-                    average: average,
-                },
-            ]);
-            setTestData(
+            setNumsData(
                 produce((draft) => {
                     draft[count] = (draft[count] || 0) + 1;
                 })
             );
+            setAverageAttackData(
+                produce((draft) => {
+                    const temp = Math.round(average * 100);
+                    draft[temp] = (draft[temp] || 0) + 1;
+                })
+            );
         }
     };
+    const cleanResult = () => {
+        setResultList([]);
+        setResultList2([]);
+        setAverageAttackData({});
+        setNumsData({});
+    };
     const getGreaterThanMinAttack = () => {
-        setRepeatList([]);
-        setTestData({});
+        cleanResult();
         for (let i = 0; i < repeat; i++) {
             getGreaterThanMinAttackOnce(i);
         }
     };
+    const getGreaterThanExpectTotalAttack = () => {
+        cleanResult();
+        if (drawData[drawData.length - 1].add * 2 < expectTotal) {
+            alert('最小屬攻總和超出範圍');
+            return;
+        }
+        const array = [];
+        const array2 = [];
+        let count = 0;
+        while (array.length < targetNums) {
+            count++;
+            const result = draw(drawData);
+            const result2 = draw(drawData);
+            if (result + result2 >= expectTotal) {
+                array.push(result);
+                array2.push(result2);
+            }
+        }
+        setResultList(array);
+        setResultList2(array2);
+        setTotal(count);
+    };
     const chartData = useMemo(() => {
-        return Object.keys(testData).map((value) => ({
-            total: parseInt(value),
-            count: testData[value],
-        }));
-    }, [testData]);
+        return {
+            nums: Object.keys(numsData).map((value) => ({
+                total: parseInt(value), //張數
+                count: numsData[value], //次數
+            })),
+            averageAttack: Object.keys(averageAttackData).map((value) => ({
+                average: value / 100,
+                count: averageAttackData[value], //次數
+            })),
+        };
+    }, [numsData, averageAttackData]);
+    const _chartPosition = useRef();
+    useEffect(() => {
+        if (chartData.nums.length > 0) {
+            _chartPosition.current.scrollIntoView({behavior: 'smooth'});
+        }
+    }, [chartData]);
     return (
         <div>
             <Header title="恢復卡衝命運卷成本預估" />
@@ -269,34 +307,10 @@ export default function DestinyScrollCalculatorScreen() {
                         />
                         <Button onClick={getGreaterThanMinAttack}>只留指定攻擊以上</Button>
                         {nowDataKey === 'weaponData' && (
-                            <Button
-                                sx={{display: 'block'}}
-                                onClick={() => {
-                                    if (drawData[drawData.length - 1].add * 2 < expectTotal) {
-                                        alert('最小屬攻總和超出範圍');
-                                        return;
-                                    }
-                                    const array = [];
-                                    const array2 = [];
-                                    let count = 0;
-                                    while (array.length < targetNums) {
-                                        count++;
-                                        const result = draw(drawData);
-                                        const result2 = draw(drawData);
-                                        if (result + result2 >= expectTotal) {
-                                            array.push(result);
-                                            array2.push(result2);
-                                        }
-                                    }
-                                    setResultList(array);
-                                    setResultList2(array2);
-                                    setTotal(count);
-                                }}
-                            >
+                            <Button sx={{display: 'block'}} onClick={getGreaterThanExpectTotalAttack}>
                                 只留最小攻屬總和以上
                             </Button>
                         )}
-                        {repeatList.length > 0 && <></>}
                         {resultList.length > 0 && (
                             <>
                                 <Typography gutterBottom>
@@ -347,16 +361,32 @@ export default function DestinyScrollCalculatorScreen() {
                         )}
                     </Box>
                 </Box>
-                {repeatList.length > 0 && (
+                <div ref={_chartPosition} />
+                {chartData.nums.length > 0 && (
                     <>
                         <Typography align="center">衝完卷數所需命運卷張數分佈圖</Typography>
-                        <ResponsiveContainer width="100%" height={500}>
-                            <LineChart width={500} height={400} data={chartData}>
+                        <ResponsiveContainer width="100%" height={400}>
+                            <LineChart width={500} height={400} data={chartData.nums}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="total" unit="張" />
-                                <YAxis dataKey="count" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="count" name="總數" stroke="#8884d8" fill="#8884d8" />
+                                <YAxis dataKey="count" unit="次" />
+                                <Tooltip
+                                    labelStyle={{color: 'black'}}
+                                    labelFormatter={(value) =>
+                                        `${value}張(${value * scrollPrice + value * restoreCardPrice}元)`
+                                    }
+                                />
+                                <Line type="monotone" dataKey="count" name="次數" stroke="#8884d8" fill="#8884d8" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                        <Typography align="center">均攻分佈圖</Typography>
+                        <ResponsiveContainer width="100%" height={400}>
+                            <LineChart width={500} height={400} data={chartData.averageAttack}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="average" unit="攻" />
+                                <YAxis dataKey="count" unit="次" />
+                                <Tooltip labelStyle={{color: 'black'}} labelFormatter={(value) => `${value}攻`} />
+                                <Line type="monotone" dataKey="count" name="次數" stroke="#8884d8" fill="#8884d8" />
                             </LineChart>
                         </ResponsiveContainer>
                     </>
